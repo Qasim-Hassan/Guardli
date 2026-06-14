@@ -14,7 +14,11 @@ Rules:
 
 Return ONLY JSON.
 
-Format:
+Do NOT wrap your response in markdown.
+
+Do NOT use ```json blocks.
+
+Return raw JSON only, strictly following this format:
 
 {
   "decision":"APPROVE|REMOVE|ESCALATE",

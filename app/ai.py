@@ -32,4 +32,8 @@ Content:
 
     raw = response.text.strip()
 
+    raw = raw.replace("```json", "")
+    raw = raw.replace("```", "")
+    raw = raw.strip()
+
     return json.loads(raw)
