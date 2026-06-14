@@ -19,7 +19,7 @@ Format:
 {
   "decision":"APPROVE|REMOVE|ESCALATE",
   "rule":"RULE_NAME_OR_NULL",
-  "confidence":0.0,
+  "confidence":0.0 - 1.0,
   "reason":"short explanation"
 }
 """
