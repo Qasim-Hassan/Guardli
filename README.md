@@ -22,3 +22,9 @@ Guardli splits its operations into two decoupled execution domains to ensure sca
 
 ---
 
+# Guardli
+AI Moderation Agent
+
+Run with:
+
+> uvicorn app.main:app --reload
