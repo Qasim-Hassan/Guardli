@@ -24,13 +24,12 @@ Content:
 
 {text}
 """
+    try: 
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
+        )
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt
-    )
-
-    if response:
         raw = response.text.strip()
 
         raw = raw.replace("```json", "")
@@ -38,7 +37,8 @@ Content:
         raw = raw.strip()
 
         return json.loads(raw)
-    else:
+
+    except Exception as e:
         return {
             "decision": "APPROVE",
             "rule": "AI_CLASSIFICATION",
