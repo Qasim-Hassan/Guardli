@@ -30,10 +30,18 @@ Content:
         contents=prompt
     )
 
-    raw = response.text.strip()
+    if response:
+        raw = response.text.strip()
 
-    raw = raw.replace("```json", "")
-    raw = raw.replace("```", "")
-    raw = raw.strip()
+        raw = raw.replace("```json", "")
+        raw = raw.replace("```", "")
+        raw = raw.strip()
 
-    return json.loads(raw)
+        return json.loads(raw)
+    else:
+        return {
+            "decision": "APPROVE",
+            "rule": "AI_CLASSIFICATION",
+            "confidence": 0.0,
+            "reason": "No response from AI"
+        }

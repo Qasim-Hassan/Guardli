@@ -8,9 +8,8 @@ Rules:
 1. No harassment
 2. No hate speech
 3. No NSFW content
-4. No self-promotion
+4. No personal attacks
 5. No misinformation
-6. No personal attacks
 
 Return ONLY JSON.
 
