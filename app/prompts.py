@@ -20,7 +20,7 @@ Do NOT use ```json blocks.
 Return raw JSON only, strictly following this format:
 
 {
-  "decision":"APPROVE|REMOVE|ESCALATE",
+  "decision":"APPROVE|REMOVE",
   "rule":"RULE_NAME_OR_NULL",
   "confidence":0.0 - 1.0,
   "reason":"short explanation"
