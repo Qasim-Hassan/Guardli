@@ -1,21 +1,20 @@
 import json
+import random
 
 from google import genai
 
 from app.config import (
-    GOOGLE_API_KEY,
+    API_KEYS,
     MODEL_NAME
 )
 
 from app.prompts import SYSTEM_PROMPT
 
-
-client = genai.Client(
-    api_key=GOOGLE_API_KEY
-)
-
-
 def classify_content(text: str):
+    ## To allow rotating through API keys in case of errors
+
+    keys = API_KEYS.copy()
+    random.shuffle(keys)
 
     prompt = f"""
 {SYSTEM_PROMPT}
@@ -24,24 +23,33 @@ Content:
 
 {text}
 """
-    try: 
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
+    
+    for key in keys:
+        try:
+            client = genai.Client(
+                api_key=key
+            )
 
-        raw = response.text.strip()
+            response = client.models.generate_content(
+                model=MODEL_NAME,
+                contents=prompt
+            )
 
-        raw = raw.replace("```json", "")
-        raw = raw.replace("```", "")
-        raw = raw.strip()
+            raw = response.text.strip()
 
-        return json.loads(raw)
+            raw = raw.replace("```json", "")
+            raw = raw.replace("```", "")
+            raw = raw.strip()
 
-    except Exception as e:
-        return {
-            "decision": "APPROVE",
-            "rule": "null",
-            "confidence": 0.0,
-            "reason": "No response from AI"
-        }
+            return json.loads(raw)
+
+        except Exception as e:
+            print("Error with API key")
+            continue
+
+    return {
+        "decision": "APPROVE",
+        "rule": "null",
+        "confidence": 0.0,
+        "reason": "No response from AI"
+    }
