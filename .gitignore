@@ -147,3 +147,22 @@ cython_debug/
 
 # VS Code (Uncomment if using VS Code)
 .vscode/
+
+# ==========================================
+# Node / TypeScript / Devvit Additions
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Devvit local configuration and runtime cache
+.devvit/
+devvit.log
+
+# TypeScript build outputs
+dist/
+out/
+*.tsbuildinfo
+
