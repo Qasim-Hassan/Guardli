@@ -10,6 +10,7 @@ Rules:
 3. No NSFW content
 4. No personal attacks
 5. No misinformation
+6. Posts should be related to International Olympiads and Academics (and topics somewhat related to them)
 
 Return ONLY JSON.
 
