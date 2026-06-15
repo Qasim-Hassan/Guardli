@@ -41,7 +41,7 @@ Content:
     except Exception as e:
         return {
             "decision": "APPROVE",
-            "rule": "AI_CLASSIFICATION",
+            "rule": "null",
             "confidence": 0.0,
             "reason": "No response from AI"
         }
