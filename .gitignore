@@ -160,6 +160,7 @@ yarn-error.log*
 # Devvit local configuration and runtime cache
 .devvit/
 devvit.log
+.DS_Store
 
 # TypeScript build outputs
 dist/
