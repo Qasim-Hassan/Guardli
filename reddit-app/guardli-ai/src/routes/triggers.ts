@@ -6,7 +6,7 @@ import type { T1, T3 } from '@devvit/shared-types/tid.js';
 
 const MODERATION_API_URL =
   process.env.MODERATION_API_URL ||
-  'https://your-backend-server.example.com/moderate';
+  'https://guardli-peach.vercel.app/moderate';
 
 type ModerationAction = 'approve' | 'remove';
 

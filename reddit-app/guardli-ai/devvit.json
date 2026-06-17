@@ -3,7 +3,14 @@
   "name": "guardli-ai",
   "server": {
     "dir": "dist/server",
-    "entry": "index.cjs"
+    "entry": "index.cjs",
+    "externalEndpoints": {
+      "moderationApi": {
+        "endpoint": "https://guardli-peach.vercel.app",
+        "name": "Guardli Moderation API",
+        "scopes": ["SCOPE_INSTALL"]
+      }
+    }
   },
   "menu": {
     "items": [
@@ -37,7 +44,12 @@
     "dev": "vite build --watch"
   },
   "permissions": {
-    "reddit": true
+    "reddit": true,
+    "externalEndpoints": true,
+    "http": {
+      "enable": true,
+      "domains": ["guardli-peach.vercel.app"]
+    }
   },
   "dev": {
     "subreddit": "guardli_ai_dev"
