@@ -11,9 +11,10 @@ const MODERATION_API_URL =
 type ModerationAction = 'approve' | 'remove';
 
 type ModerationResponse = {
-  action: ModerationAction;
-  spam?: boolean;
-  reason?: string;
+  decision: string;
+  rule?: string;
+  confidence: number;
+  reason: string;
 };
 
 const normalizeThingId = (
@@ -44,40 +45,46 @@ const sendModerationRequest = async (payload: unknown) => {
         response.status,
         text
       );
-      return { action: 'approve' as ModerationAction };
+      return { action: 'approve' as ModerationAction, reason: 'API error' };
     }
 
     const body = (await response.json()) as Partial<ModerationResponse>;
-    if (body.action !== 'approve' && body.action !== 'remove') {
+    if (!body.decision) {
       console.warn(
-        'Moderation API returned invalid action, defaulting to approve',
+        'Moderation API returned missing decision, defaulting to approve',
         body
       );
-      return { action: 'approve' as ModerationAction };
+      return { action: 'approve' as ModerationAction, reason: 'Missing decision' };
     }
 
+    const decision = body.decision.toLowerCase();
+    const action: ModerationAction =
+      decision === 'remove' || decision === 'block' || decision === 'spam'
+        ? 'remove'
+        : 'approve';
+
     return {
-      action: body.action,
-      spam: Boolean(body.spam),
+      action,
+      rule: body.rule,
+      confidence: body.confidence,
       reason: body.reason,
     };
   } catch (error: unknown) {
     console.error('Moderation API request failed', error);
-    return { action: 'approve' as ModerationAction };
+    return { action: 'approve' as ModerationAction, reason: 'Request failed' };
   }
 };
 
 const moderateThing = async (
   id: string,
   type: 'comment' | 'post',
-  action: ModerationAction,
-  spam = false
+  action: ModerationAction
 ) => {
   const thingId = normalizeThingId(id, type);
 
   try {
     if (action === 'remove') {
-      await reddit.remove(thingId, spam);
+      await reddit.remove(thingId, false);
       return { success: true, action: 'removed' };
     }
 
@@ -102,22 +109,15 @@ const handleCreateEvent = async (
     }
 
     const payload = {
-      eventType: type,
-      id: thingId,
-      subredditId: commentEvent.subreddit?.id,
-      authorId: commentEvent.author?.id,
-      body: commentEvent.comment?.body,
-      title: undefined,
-      permalink: commentEvent.comment?.permalink,
-      event: commentEvent,
+      title: '',
+      body: commentEvent.comment?.body || '',
     };
 
     const decision = await sendModerationRequest(payload);
     const moderationResult = await moderateThing(
       thingId,
       type,
-      decision.action,
-      Boolean(decision.spam)
+      decision.action
     );
 
     if (!moderationResult.success) {
@@ -142,22 +142,15 @@ const handleCreateEvent = async (
   }
 
   const payload = {
-    eventType: type,
-    id: thingId,
-    subredditId: postEvent.subreddit?.id,
-    authorId: postEvent.author?.id,
-    body: postEvent.post?.selftext,
-    title: postEvent.post?.title,
-    permalink: postEvent.post?.permalink,
-    event: postEvent,
+    title: postEvent.post?.title || '',
+    body: postEvent.post?.selftext || '',
   };
 
   const decision = await sendModerationRequest(payload);
   const moderationResult = await moderateThing(
     thingId,
     type,
-    decision.action,
-    Boolean(decision.spam)
+    decision.action
   );
 
   if (!moderationResult.success) {
