@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "name": "guardli-ai",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "deploy": "npm run type-check && npm run lint && devvit upload",
+    "dev": "devvit playtest",
+    "launch": "npm run deploy && devvit publish",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "login": "devvit login",
+    "prettier": "prettier --write .",
+    "type-check": "tsc --build"
+  },
+  "engines": {
+    "node": ">=22.2.0"
+  },
+  "dependencies": {
+    "@devvit/start": "0.13.4",
+    "@devvit/web": "0.13.4",
+    "@hono/node-server": "^2.0.3",
+    "devvit": "0.13.4",
+    "hono": "4.12.21"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "^22.19.19",
+    "eslint": "10.4.0",
+    "globals": "17.6.0",
+    "prettier": "3.8.3",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.59.4",
+    "vite": "8.0.13"
+  }
+}
