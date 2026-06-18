@@ -3,14 +3,7 @@
   "name": "guardli-ai",
   "server": {
     "dir": "dist/server",
-    "entry": "index.cjs",
-    "externalEndpoints": {
-      "moderationApi": {
-        "endpoint": "https://guardli-peach.vercel.app",
-        "name": "Guardli Moderation API",
-        "scopes": ["SCOPE_INSTALL"]
-      }
-    }
+    "entry": "index.cjs"
   },
   "menu": {
     "items": [
@@ -45,7 +38,6 @@
   },
   "permissions": {
     "reddit": true,
-    "externalEndpoints": true,
     "http": {
       "enable": true,
       "domains": ["guardli-peach.vercel.app"]

@@ -8,7 +8,7 @@ const MODERATION_API_URL =
   process.env.MODERATION_API_URL ||
   'https://guardli-peach.vercel.app/moderate';
 
-type ModerationAction = 'approve' | 'remove';
+type ModerationAction = 'approve' | 'remove' | 'none';
 
 type ModerationResponse = {
   decision: string;
@@ -45,16 +45,16 @@ const sendModerationRequest = async (payload: unknown) => {
         response.status,
         text
       );
-      return { action: 'approve' as ModerationAction, reason: 'API error' };
+      return { action: 'none' as ModerationAction, reason: 'API error' };
     }
 
     const body = (await response.json()) as Partial<ModerationResponse>;
     if (!body.decision) {
       console.warn(
-        'Moderation API returned missing decision, defaulting to approve',
+        'Moderation API returned missing decision, leaving content unchanged',
         body
       );
-      return { action: 'approve' as ModerationAction, reason: 'Missing decision' };
+      return { action: 'none' as ModerationAction, reason: 'Missing decision' };
     }
 
     const decision = body.decision.toLowerCase();
@@ -71,7 +71,7 @@ const sendModerationRequest = async (payload: unknown) => {
     };
   } catch (error: unknown) {
     console.error('Moderation API request failed', error);
-    return { action: 'approve' as ModerationAction, reason: 'Request failed' };
+    return { action: 'none' as ModerationAction, reason: 'Request failed' };
   }
 };
 
@@ -114,6 +114,16 @@ const handleCreateEvent = async (
     };
 
     const decision = await sendModerationRequest(payload);
+
+    if (decision.action === 'none') {
+      console.warn('Moderation request failed, not altering content');
+      return {
+        status: 'success',
+        action: 'none',
+        reason: decision.reason,
+      };
+    }
+
     const moderationResult = await moderateThing(
       thingId,
       type,
