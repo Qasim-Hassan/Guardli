@@ -4,9 +4,11 @@ import type { OnAppInstallRequest, TriggerResponse } from '@devvit/web/shared';
 import type { CommentCreate, PostCreate } from '@devvit/protos/json/devvit/events/v1alpha/events.js';
 import type { T1, T3 } from '@devvit/shared-types/tid.js';
 
-const MODERATION_API_URL =
-  process.env.MODERATION_API_URL ||
-  'https://guardli-peach.vercel.app/moderate';
+if (!apiKey) {
+  console.error("Google API key is not configured.");
+  return;
+}
+const MODERATION_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key=apiKey`;
 
 type ModerationAction = 'approve' | 'remove' | 'none';
 
