@@ -40,7 +40,7 @@
     "reddit": true,
     "http": {
       "enable": true,
-      "domains": ["guardli-peach.vercel.app"]
+      "domains": ["generativelanguage.googleapis.com"]
     }
   },
   "dev": {

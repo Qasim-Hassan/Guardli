@@ -3,12 +3,7 @@ import { reddit } from '@devvit/web/server';
 import type { OnAppInstallRequest, TriggerResponse } from '@devvit/web/shared';
 import type { CommentCreate, PostCreate } from '@devvit/protos/json/devvit/events/v1alpha/events.js';
 import type { T1, T3 } from '@devvit/shared-types/tid.js';
-
-if (!apiKey) {
-  console.error("Google API key is not configured.");
-  return;
-}
-const MODERATION_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key=apiKey`;
+import { settings } from '@devvit/web/server';
 
 type ModerationAction = 'approve' | 'remove' | 'none';
 
@@ -30,15 +25,33 @@ const normalizeThingId = (
   return (type === 'comment' ? `t1_${id}` : `t3_${id}`) as T1 | T3;
 };
 
-const sendModerationRequest = async (payload: unknown) => {
+const sendModerationRequest = async (payload: string, apiKey?: string) => {
+  if (!apiKey) {
+    console.error('Missing Google API key');
+    return { action: 'none' as ModerationAction, reason: 'Missing API key' };
+  }
+
   try {
-    const response = await fetch(MODERATION_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: payload,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     if (!response.ok) {
       const text = await response.text();
@@ -110,12 +123,10 @@ const handleCreateEvent = async (
       return { status: 'error', error: 'missing content id' };
     }
 
-    const payload = {
-      title: '',
-      body: commentEvent.comment?.body || '',
-    };
+    const payload = commentEvent.comment?.body || '';
 
-    const decision = await sendModerationRequest(payload);
+    const apiKey = (await settings.get('google_api_key')) as string | undefined;
+    const decision = await sendModerationRequest(payload, apiKey);
 
     if (decision.action === 'none') {
       console.warn('Moderation request failed, not altering content');
@@ -153,12 +164,22 @@ const handleCreateEvent = async (
     return { status: 'error', error: 'missing content id' };
   }
 
-  const payload = {
-    title: postEvent.post?.title || '',
-    body: postEvent.post?.selftext || '',
-  };
+  const payload = [postEvent.post?.title, postEvent.post?.selftext]
+    .filter((value): value is string => Boolean(value))
+    .join('\n\n');
 
-  const decision = await sendModerationRequest(payload);
+  const apiKey = (await settings.get('google_api_key')) as string | undefined;
+  const decision = await sendModerationRequest(payload, apiKey);
+
+  if (decision.action === 'none') {
+    console.warn('Moderation request failed, not altering content');
+    return {
+      status: 'success',
+      action: 'none',
+      reason: decision.reason,
+    };
+  }
+
   const moderationResult = await moderateThing(
     thingId,
     type,
@@ -206,5 +227,6 @@ triggers.post('/on-post-create', async (c) => {
   console.log('Post create event', { subredditId: event.subreddit?.id });
 
   const result = await handleCreateEvent('post', event);
+  
   return c.json(result, 200);
 });
