@@ -14,6 +14,38 @@ type ModerationResponse = {
   reason: string;
 };
 
+const systemPrompt = `
+You are an expert Reddit moderator.
+
+Your task is to determine whether content violates community rules.
+
+Rules:
+
+1. No harassment
+2. No hate speech
+3. No NSFW content
+4. No personal attacks
+5. No misinformation
+6. Posts should be related to International Olympiads and Academics (and topics somewhat related to them). Allow normal greetings or routine discussions, but not anything off-topic.
+
+Return ONLY JSON.
+
+Do not explain.
+Do not reason.
+Do not analyze.
+Do not use markdown.
+Do not use code blocks.
+Return raw JSON only, strictly following this format: 
+{
+  "decision":"APPROVE|REMOVE",
+  "rule":"RULE_NAME_OR_NULL",
+  "confidence":0.0 - 1.0,
+  "reason":"short explanation"
+}
+
+Here is the content to moderate:
+`
+
 const normalizeThingId = (
   id: string,
   type: 'comment' | 'post'
@@ -33,7 +65,7 @@ const sendModerationRequest = async (payload: string, apiKey?: string) => {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -44,11 +76,36 @@ const sendModerationRequest = async (payload: string, apiKey?: string) => {
             {
               parts: [
                 {
-                  text: payload,
+                  text: systemPrompt + payload,
                 },
               ],
             },
           ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                decision: {
+                  type: "STRING"
+                },
+                rule: {
+                  type: "STRING"
+                },
+                confidence: {
+                  type: "NUMBER"
+                },
+                reason: {
+                  type: "STRING"
+                }
+              },
+              required: [
+                "decision",
+                "confidence",
+                "reason"
+              ]
+            }
+          }
         }),
       }
     );
@@ -63,7 +120,7 @@ const sendModerationRequest = async (payload: string, apiKey?: string) => {
       return { action: 'none' as ModerationAction, reason: 'API error' };
     }
 
-    const body = (await response.json()) as Partial<ModerationResponse>;
+    const body = JSON.parse((await response.json()).candidates?.[0]?.content?.parts?.[0]?.text) as Partial<ModerationResponse>;
     if (!body.decision) {
       console.warn(
         'Moderation API returned missing decision, leaving content unchanged',
@@ -125,7 +182,7 @@ const handleCreateEvent = async (
 
     const payload = commentEvent.comment?.body || '';
 
-    const apiKey = (await settings.get('google_api_key')) as string | undefined;
+    const apiKey = await settings.get<string>('google_api_key');
     const decision = await sendModerationRequest(payload, apiKey);
 
     if (decision.action === 'none') {
@@ -168,7 +225,7 @@ const handleCreateEvent = async (
     .filter((value): value is string => Boolean(value))
     .join('\n\n');
 
-  const apiKey = (await settings.get('google_api_key')) as string | undefined;
+  const apiKey = await settings.get<string>('google_api_key');
   const decision = await sendModerationRequest(payload, apiKey);
 
   if (decision.action === 'none') {
