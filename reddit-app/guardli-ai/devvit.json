@@ -43,6 +43,15 @@
       "domains": ["generativelanguage.googleapis.com"]
     }
   },
+  "settings": {
+    "global": {
+      "googleApi": {
+        "type": "string",
+        "label": "API Key",
+        "isSecret": true
+      }
+    }
+  },
   "dev": {
     "subreddit": "guardli_ai_dev"
   }

@@ -182,7 +182,7 @@ const handleCreateEvent = async (
 
     const payload = commentEvent.comment?.body || '';
 
-    const apiKey = await settings.get<string>('google_api_key');
+    const apiKey = await settings.get<string>('googleApi');
     const decision = await sendModerationRequest(payload, apiKey);
 
     if (decision.action === 'none') {
@@ -225,7 +225,7 @@ const handleCreateEvent = async (
     .filter((value): value is string => Boolean(value))
     .join('\n\n');
 
-  const apiKey = await settings.get<string>('google_api_key');
+  const apiKey = await settings.get<string>('googleApi');
   const decision = await sendModerationRequest(payload, apiKey);
 
   if (decision.action === 'none') {
