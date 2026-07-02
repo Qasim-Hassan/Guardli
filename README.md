@@ -6,7 +6,7 @@
 
 ## 🚀 Key Features
 
-* **Real-Time Data Streaming:** Leverages official APIs to fetch messages, posts and comments as soon as they are published.
+* **Real-Time Data Streaming:** Leverages official APIs to fetch posts and comments as soon as they are published.
 * **Intelligent Content Evaluation:** Integrates with state-of-the-art LLMs via the Google GenAI SDK to understand contextual nuance, spam, and policy violations beyond simple keyword matching.
 * **High-Availability API Key Rotation:** Built with a resilient backend architecture that automatically detects API rate limits or exhaustion and switches to secondary credential sets seamlessly without system downtime.
 * **Automated Action Execution:** Instantly fires moderation dispatches (removals, flags, or logs) back to the target community space via secure webhooks and API endpoints.
