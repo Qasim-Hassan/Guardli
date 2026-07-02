@@ -14,7 +14,7 @@
 
 ## 🛠️ System Architecture
 
-Guardli splits its operations into two decoupled execution domains to ensure scalability and ease of deployment:
+Guardli is a **Monorepo** that is broken down into two different systems under the hood:
 
 1.  **The Infrastructure & Ingestion Layer:** Manages the active real-time data connection, tracks administrative credentials, handles error reporting thresholds, and enforces structural action requests (e.g., automated removals).
 2.  **The Intelligence & Logic Layer:** Manages advanced prompt routing topologies, formats inputs securely into structured JSON payloads, communicates with upstream LLM interfaces, and parses response variables into definitive actions.
@@ -23,4 +23,6 @@ Guardli splits its operations into two decoupled execution domains to ensure sca
 
 # Run with:
 
-> uvicorn app.main:app --reload
+Navigate to /reddit-app/guardli-ai and run:
+
+> npm run dev
