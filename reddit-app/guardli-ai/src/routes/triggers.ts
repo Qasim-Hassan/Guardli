@@ -57,6 +57,15 @@ const normalizeThingId = (
   return (type === 'comment' ? `t1_${id}` : `t3_${id}`) as T1 | T3;
 };
 
+const SPAM_PATTERNS: RegExp[] = [
+  /free money/,
+  /earn \$\d+/,
+  /crypto giveaway/,
+  /click here/,
+  /telegram.*join/,
+];
+
+
 const sendModerationRequest = async (payload: string, apiKey?: string) => {
   if (!apiKey) {
     console.error('Missing Google API key');
