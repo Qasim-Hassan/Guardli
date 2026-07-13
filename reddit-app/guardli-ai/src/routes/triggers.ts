@@ -77,7 +77,7 @@ function detectSpam(text: string): boolean {
 }
 
 const sendModerationRequest = async (payload: string, apiKey?: string) => {
-  console.log(payload);
+  const isSpam = detectSpam(payload);
   if (!apiKey) {
     console.error('Missing Google API key');
     return { action: 'none' as ModerationAction, reason: 'Missing API key' };
