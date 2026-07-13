@@ -78,6 +78,14 @@ function detectSpam(text: string): boolean {
 
 const sendModerationRequest = async (payload: string, apiKey?: string) => {
   const isSpam = detectSpam(payload);
+  if (isSpam) {
+    return {
+      action: 'remove' as ModerationAction,
+      rule: 'spam',
+      confidence: 1.0,
+      reason: 'Detected spam pattern',
+    };
+  }
   if (!apiKey) {
     console.error('Missing Google API key');
     return { action: 'none' as ModerationAction, reason: 'Missing API key' };
