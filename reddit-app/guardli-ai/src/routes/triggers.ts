@@ -65,6 +65,17 @@ const SPAM_PATTERNS: RegExp[] = [
   /telegram.*join/,
 ];
 
+export function detectSpam(text: string): boolean {
+  const lowered = text.toLowerCase();
+
+  for (const pattern of SPAM_PATTERNS) {
+    if (pattern.test(lowered)) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 const sendModerationRequest = async (payload: string, apiKey?: string) => {
   if (!apiKey) {
