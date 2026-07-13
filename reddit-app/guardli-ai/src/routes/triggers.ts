@@ -86,6 +86,7 @@ const sendModerationRequest = async (payload: string, apiKey?: string) => {
       reason: 'Detected spam pattern',
     };
   }
+  
   if (!apiKey) {
     console.error('Missing Google API key');
     return { action: 'none' as ModerationAction, reason: 'Missing API key' };
