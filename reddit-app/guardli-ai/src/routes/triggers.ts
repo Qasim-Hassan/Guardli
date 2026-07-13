@@ -61,7 +61,6 @@ const SPAM_PATTERNS: RegExp[] = [
   /free money/,
   /earn \$\d+/,
   /crypto giveaway/,
-  /click here/,
   /telegram.*join/,
 ];
 
