@@ -1,3 +1,7 @@
+> [!WARNING]
+> **Disclaimer:** The software provided in this repository is for educational purposes only. Use it at your own risk. The authors are not responsible for any misuse or damage caused by this program.
+
+
 # Guardli 🛡️
 
 **Guardli** is an automated, AI-powered content moderation agent designed to monitor reddit communities in real time. By streaming raw communication data directly via platform APIs and processing text content through advanced language models, Guardli detects rule-breaking content and instantly executes defensive moderation actions to keep digital spaces clean and safe.
